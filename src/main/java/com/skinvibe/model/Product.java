@@ -38,7 +38,7 @@ public class Product {
     @Column(name = "sku", unique = true)
     private String sku;
     
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 1000)
     private String imageUrl;
     
     @Column(name = "is_active")

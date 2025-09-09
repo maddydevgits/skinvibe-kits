@@ -23,7 +23,7 @@ public class Category {
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
     
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 1000)
     private String imageUrl;
     
     @Column(name = "is_active")
