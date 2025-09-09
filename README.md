@@ -32,14 +32,14 @@ A modern e-commerce platform for skincare products built with Spring Boot, MySQL
 ### 1. Database Setup
 
 1. Install MySQL 8.0
-2. Create a database named `skinvibe_db`:
+2. Create a database named `skinvibe`:
    ```sql
    CREATE DATABASE skinvibe_db;
    ```
 3. Create a user for the application:
    ```sql
    CREATE USER 'skinvibe_user'@'localhost' IDENTIFIED BY 'skinvibe_password';
-   GRANT ALL PRIVILEGES ON skinvibe_db.* TO 'skinvibe_user'@'localhost';
+   GRANT ALL PRIVILEGES ON skinvibe.* TO 'skinvibe_user'@'localhost';
    FLUSH PRIVILEGES;
    ```
 
@@ -48,7 +48,7 @@ A modern e-commerce platform for skincare products built with Spring Boot, MySQL
 Update the database configuration in `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/skinvibe_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.url=jdbc:mysql://localhost:3306/skinvibe?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=skinvibe_user
 spring.datasource.password=skinvibe_password
 ```
