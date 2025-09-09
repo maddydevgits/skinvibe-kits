@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title>Checkout - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+                    <p class="mt-2 text-gray-600">Complete your order</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Order Form -->
+                    <div class="space-y-8">
+                        <!-- Shipping Address -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h2>
+                            
+                            <div th:if="${addresses != null and !addresses.empty}">
+                                <div class="space-y-3 mb-4">
+                                    <div th:each="address : ${addresses}" class="border border-gray-200 rounded-lg p-4">
+                                        <label class="flex items-start space-x-3">
+                                            <input type="radio" name="shippingAddressId" th:value="${address.id}" 
+                                                   th:checked="${address.isDefault}" 
+                                                   class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                            <div class="flex-1">
+                                                <div class="font-medium text-gray-900">Address #<span th:text="${address.id}">1</span></div>
+                                                <div class="text-sm text-gray-600" th:text="${address.streetAddress}">123 Main St</div>
+                                                <div class="text-sm text-gray-600" th:text="${address.city + ', ' + address.state + ' ' + address.postalCode}">City, State 12345</div>
+                                                <div class="text-sm text-gray-600" th:text="${address.country}">Country</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <a href="/addresses" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                                    Manage Addresses
+                                </a>
+                            </div>
+                            
+                            <div th:if="${addresses == null or addresses.empty}" class="text-center py-8">
+                                <p class="text-gray-600 mb-4">No addresses found. Please add a shipping address.</p>
+                                <a href="/addresses/add" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                                    Add Address
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Method</h2>
+                            
+                            <form th:action="@{/orders/place}" th:object="${order}" method="post">
+                                <div class="space-y-3">
+                                    <div class="flex items-center">
+                                        <input type="radio" id="creditCard" th:field="*{paymentMethod}" value="CREDIT_CARD" 
+                                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="creditCard" class="ml-3 text-sm font-medium text-gray-700">Credit Card</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="debitCard" th:field="*{paymentMethod}" value="DEBIT_CARD" 
+                                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="debitCard" class="ml-3 text-sm font-medium text-gray-700">Debit Card</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="paypal" th:field="*{paymentMethod}" value="PAYPAL" 
+                                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="paypal" class="ml-3 text-sm font-medium text-gray-700">PayPal</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="bankTransfer" th:field="*{paymentMethod}" value="BANK_TRANSFER" 
+                                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="bankTransfer" class="ml-3 text-sm font-medium text-gray-700">Bank Transfer</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="cashOnDelivery" th:field="*{paymentMethod}" value="CASH_ON_DELIVERY" 
+                                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="cashOnDelivery" class="ml-3 text-sm font-medium text-gray-700">Cash on Delivery</label>
+                                    </div>
+                                </div>
+
+                                <!-- Order Notes -->
+                                <div class="mt-6">
+                                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Order Notes (Optional)</label>
+                                    <textarea id="notes" th:field="*{notes}" rows="3" 
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                                              placeholder="Any special instructions for your order..."></textarea>
+                                </div>
+
+                                <!-- Hidden Fields -->
+                                <input type="hidden" name="shippingAddressId" id="shippingAddressId" required>
+                                <input type="hidden" name="billingAddressId" id="billingAddressId">
+
+                                <!-- Place Order Button -->
+                                <div class="mt-6">
+                                    <button type="submit" 
+                                            class="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold">
+                                        Place Order
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+                            
+                            <!-- Cart Items -->
+                            <div class="space-y-4 mb-6">
+                                <div th:each="item : ${cartItems}" class="flex items-center space-x-3">
+                                    <img th:src="${item.product.imageUrl} ?: '/images/placeholder-product.jpg'" 
+                                         th:alt="${item.product.name}" 
+                                         class="w-12 h-12 object-cover rounded">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-sm font-medium text-gray-900" th:text="${item.product.name}">Product Name</h3>
+                                        <p class="text-sm text-gray-600" th:text="'Qty: ' + ${item.quantity}">Qty: 1</p>
+                                    </div>
+                                    <div class="text-sm font-medium text-gray-900" 
+                                         th:text="${#numbers.formatDecimal(item.product.price.multiply(item.quantity), 1, 2)}">$29.99</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Order Totals -->
+                            <div class="space-y-2 border-t pt-4">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="font-semibold" th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">$59.98</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Shipping</span>
+                                    <span class="font-semibold">$5.99</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Tax</span>
+                                    <span class="font-semibold" th:text="${#numbers.formatDecimal(cartTotal.multiply(0.08), 1, 2)}">$4.80</span>
+                                </div>
+                                <div class="flex justify-between text-lg font-bold">
+                                    <span>Total</span>
+                                    <span class="text-purple-600" 
+                                          th:text="${#numbers.formatDecimal(cartTotal.add(5.99).add(cartTotal.multiply(0.08)), 1, 2)}">$70.77</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Notice -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-green-800">Secure Checkout</h3>
+                                    <p class="text-sm text-green-700 mt-1">Your payment information is secure and encrypted.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript for Address Selection -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const addressRadios = document.querySelectorAll('input[name="shippingAddressId"]');
+                const shippingAddressIdInput = document.getElementById('shippingAddressId');
+                
+                addressRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        if (this.checked) {
+                            shippingAddressIdInput.value = this.value;
+                        }
+                    });
+                });
+                
+                // Set initial value
+                const checkedRadio = document.querySelector('input[name="shippingAddressId"]:checked');
+                if (checkedRadio) {
+                    shippingAddressIdInput.value = checkedRadio.value;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="'Order #' + ${order.orderNumber} + ' - SkinVibe Admin'">Order Details - SkinVibe Admin</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900" th:text="'Order #' + ${order.orderNumber}">Order #SKV-12345678</h1>
+                            <p class="mt-2 text-gray-600" th:text="${#temporals.format(order.createdAt, 'MMM dd, yyyy')} + ' at ' + ${#temporals.format(order.createdAt, 'hh:mm a')}">Jan 15, 2024 at 2:30 PM</p>
+                        </div>
+                        <div>
+                            <a href="/admin/orders" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Back to Orders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Order Items -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
+                            
+                            <div class="space-y-4">
+                                <div th:each="item : ${order.orderItems}" class="flex items-center space-x-4 border-b border-gray-200 pb-4 last:border-b-0">
+                                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" 
+                                         class="w-16 h-16 object-cover rounded-lg">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg font-semibold text-gray-900" th:text="${item.product.name}">Product Name</h3>
+                                        <p class="text-sm text-gray-600" th:text="${item.product.category.name}">Category</p>
+                                        <p class="text-sm text-gray-600" th:text="'Qty: ' + ${item.quantity}">Qty: 1</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-bold text-gray-900" th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">$29.99</div>
+                                        <div class="text-sm text-gray-600">each</div>
+                                        <div class="text-lg font-bold text-purple-600" th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">$29.99</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Total -->
+                            <div class="mt-6 border-t border-gray-200 pt-4">
+                                <div class="flex justify-between text-lg font-semibold">
+                                    <span>Total:</span>
+                                    <span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$70.77</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Management -->
+                    <div class="space-y-6">
+                        <!-- Order Status -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Status</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Status</label>
+                                    <span th:if="${order.orderStatus.name() == 'PENDING'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">PENDING</span>
+                                    <span th:if="${order.orderStatus.name() == 'CONFIRMED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">CONFIRMED</span>
+                                    <span th:if="${order.orderStatus.name() == 'PROCESSING'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-800">PROCESSING</span>
+                                    <span th:if="${order.orderStatus.name() == 'SHIPPED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">SHIPPED</span>
+                                    <span th:if="${order.orderStatus.name() == 'DELIVERED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">DELIVERED</span>
+                                    <span th:if="${order.orderStatus.name() == 'CANCELLED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">CANCELLED</span>
+                                </div>
+                                
+                                <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+                                    <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                        <option th:each="status : ${T(com.skinvibe.model.Order$OrderStatus).values()}" 
+                                                th:value="${status}" 
+                                                th:selected="${status.name() == order.orderStatus.name()}"
+                                                th:text="${status.name()}">PENDING</option>
+                                    </select>
+                                    <button type="submit" class="mt-2 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                        Update Status
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Payment Status -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Status</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Status</label>
+                                    <span th:if="${order.paymentStatus.name() == 'PAID'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">PAID</span>
+                                    <span th:if="${order.paymentStatus.name() == 'PENDING'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">PENDING</span>
+                                    <span th:if="${order.paymentStatus.name() == 'FAILED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">FAILED</span>
+                                    <span th:if="${order.paymentStatus.name() == 'REFUNDED'}" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800">REFUNDED</span>
+                                </div>
+                                
+                                <form th:action="@{/admin/orders/{id}/payment-status(id=${order.id})}" method="post">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Update Payment Status</label>
+                                    <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                        <option th:each="status : ${T(com.skinvibe.model.Order$PaymentStatus).values()}" 
+                                                th:value="${status}" 
+                                                th:selected="${status.name() == order.paymentStatus.name()}"
+                                                th:text="${status.name()}">PENDING</option>
+                                    </select>
+                                    <button type="submit" class="mt-2 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Update Payment Status
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Customer Information -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Customer Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Name:</span>
+                                    <span th:text="${order.user.firstName + ' ' + order.user.lastName}">John Doe</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Email:</span>
+                                    <span th:text="${order.user.email}">john@example.com</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Phone:</span>
+                                    <span th:text="${order.user.phoneNumber ?: 'N/A'}">+1 234 567 8900</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6" th:if="${order.shippingAddress}">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h3>
+                            <div class="text-sm text-gray-700">
+                                <div th:text="${order.shippingAddress.streetAddress}">123 Main St</div>
+                                <div th:if="${order.shippingAddress.addressLine2}" th:text="${order.shippingAddress.addressLine2}">Apt 4B</div>
+                                <div th:text="${order.shippingAddress.city + ', ' + order.shippingAddress.state + ' ' + order.shippingAddress.postalCode}">City, State 12345</div>
+                                <div th:text="${order.shippingAddress.country}">Country</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="${product.id != null ? 'Edit Product' : 'Add Product'} + ' - SkinVibe Admin'">Add Product - SkinVibe Admin</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900" th:text="${product.id != null ? 'Edit Product' : 'Add New Product'}">Add New Product</h1>
+                            <p class="mt-2 text-gray-600" th:text="${product.id != null ? 'Update product information' : 'Fill in the details to add a new product'}">Fill in the details to add a new product</p>
+                        </div>
+                        <div>
+                            <a href="/admin/products" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Back to Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form th:action="${product.id != null ? '/admin/products/edit/' + product.id : '/admin/products/add'}" method="post" class="space-y-6">
+                    <div class="bg-white shadow px-4 py-5 sm:p-6 sm:rounded-lg">
+                        <div class="grid grid-cols-1 gap-6">
+                            <!-- Product Name -->
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                                <input type="text" id="name" name="name" th:value="${product.name}" required
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                            </div>
+
+                            <!-- SKU -->
+                            <div>
+                                <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+                                <input type="text" id="sku" name="sku" th:value="${product.sku}" required
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="description" name="description" th:text="${product.description}" rows="4"
+                                          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"></textarea>
+                            </div>
+
+                            <!-- Category -->
+                            <div>
+                                <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                                <select id="category" name="category" th:value="${product.category != null ? product.category.id : ''}" required
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                    <option value="">Select a category</option>
+                                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                                </select>
+                            </div>
+
+                            <!-- Price and Stock -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                                    <input type="number" id="price" name="price" th:value="${product.price}" step="0.01" min="0" required
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="stockQuantity" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+                                    <input type="number" id="stockQuantity" name="stockQuantity" th:value="${product.stockQuantity}" min="0" required
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Weight and Dimensions -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="weight" class="block text-sm font-medium text-gray-700">Weight (grams)</label>
+                                    <input type="number" id="weight" name="weight" th:value="${product.weight}" step="0.1" min="0"
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="dimensions" class="block text-sm font-medium text-gray-700">Dimensions (LxWxH cm)</label>
+                                    <input type="text" id="dimensions" name="dimensions" th:value="${product.dimensions}" placeholder="15x5x5"
+                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Image URL -->
+                            <div>
+                                <label for="imageUrl" class="block text-sm font-medium text-gray-700">Product Image URL</label>
+                                <input type="url" id="imageUrl" name="imageUrl" th:value="${product.imageUrl}" 
+                                       placeholder="https://example.com/image.jpg"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                <p class="mt-1 text-sm text-gray-500">Enter the full URL of the product image</p>
+                                <div th:if="${product.imageUrl != null and product.imageUrl != ''}" class="mt-2">
+                                    <p class="text-sm text-gray-500">Current image:</p>
+                                    <img th:src="${product.imageUrl}" th:alt="${product.name}" class="mt-1 h-20 w-20 object-cover rounded-lg">
+                                </div>
+                            </div>
+
+                            <!-- Status and Featured -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="isActive" th:checked="${product.isActive}" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                        <span class="ml-2 text-sm text-gray-700">Active</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="isFeatured" th:checked="${product.isFeatured}" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                        <span class="ml-2 text-sm text-gray-700">Featured</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3">
+                        <a href="/admin/products" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span th:text="${product.id != null ? 'Update Product' : 'Add Product'}">Add Product</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

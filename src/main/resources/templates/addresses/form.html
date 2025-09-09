@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="${address.id != null} ? 'Edit Address - SkinVibe' : 'Add Address - SkinVibe'">Add Address - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900" th:text="${address.id != null} ? 'Edit Address' : 'Add New Address'">Add New Address</h1>
+                    <p class="mt-2 text-gray-600">Enter your address information</p>
+                </div>
+
+                <!-- Address Form -->
+                <form th:action="${address.id != null} ? @{/addresses/edit/{id}(id=${address.id})} : @{/addresses/add}" 
+                      th:object="${address}" method="post" class="space-y-6">
+                    
+
+                    <!-- Street Address -->
+                    <div>
+                        <label for="streetAddress" class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                        <input type="text" id="streetAddress" th:field="*{streetAddress}" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                               placeholder="123 Main Street">
+                        <div th:if="${#fields.hasErrors('streetAddress')}" class="text-red-500 text-sm mt-1" th:errors="*{streetAddress}"></div>
+                    </div>
+
+                    <!-- Address Line 2 -->
+                    <div>
+                        <label for="addressLine2" class="block text-sm font-medium text-gray-700 mb-2">Address Line 2 (Optional)</label>
+                        <input type="text" id="addressLine2" th:field="*{addressLine2}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                               placeholder="Apartment, suite, unit, building, floor, etc.">
+                        <div th:if="${#fields.hasErrors('addressLine2')}" class="text-red-500 text-sm mt-1" th:errors="*{addressLine2}"></div>
+                    </div>
+
+                    <!-- City, State, Postal Code -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <input type="text" id="city" th:field="*{city}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <div th:if="${#fields.hasErrors('city')}" class="text-red-500 text-sm mt-1" th:errors="*{city}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="state" class="block text-sm font-medium text-gray-700 mb-2">State/Province</label>
+                            <input type="text" id="state" th:field="*{state}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <div th:if="${#fields.hasErrors('state')}" class="text-red-500 text-sm mt-1" th:errors="*{state}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                            <input type="text" id="postalCode" th:field="*{postalCode}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <div th:if="${#fields.hasErrors('postalCode')}" class="text-red-500 text-sm mt-1" th:errors="*{postalCode}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                        <select id="country" th:field="*{country}" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <option value="">Select Country</option>
+                            <option value="United States">United States</option>
+                            <option value="Canada">Canada</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Japan">Japan</option>
+                            <option value="China">China</option>
+                            <option value="India">India</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('country')}" class="text-red-500 text-sm mt-1" th:errors="*{country}"></div>
+                    </div>
+
+                    <!-- Address Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <input type="radio" id="shipping" th:field="*{addressType}" value="SHIPPING"
+                                       class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                <label for="shipping" class="ml-3 text-sm font-medium text-gray-700">Shipping Address</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="billing" th:field="*{addressType}" value="BILLING"
+                                       class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                <label for="billing" class="ml-3 text-sm font-medium text-gray-700">Billing Address</label>
+                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('addressType')}" class="text-red-500 text-sm mt-1" th:errors="*{addressType}"></div>
+                    </div>
+
+                    <!-- Default Address -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="isDefault" th:field="*{isDefault}"
+                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                        <label for="isDefault" class="ml-3 text-sm font-medium text-gray-700">
+                            Set as default address
+                        </label>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex space-x-4 pt-6">
+                        <button type="submit" 
+                                class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold">
+                            <span th:text="${address.id != null} ? 'Update Address' : 'Add Address'">Add Address</span>
+                        </button>
+                        <a href="/addresses" 
+                           class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 font-semibold">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

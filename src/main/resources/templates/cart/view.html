@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title>Shopping Cart - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+                    <p class="mt-2 text-gray-600">Review your items before checkout</p>
+                </div>
+
+                <!-- Cart Items -->
+                <div th:if="${cartItems != null and !cartItems.empty}" class="space-y-6">
+                    <div th:each="item : ${cartItems}" class="bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex items-center space-x-4">
+                            <!-- Product Image -->
+                            <div class="flex-shrink-0">
+                                <img th:src="${item.product.imageUrl} ?: '/images/placeholder-product.jpg'" 
+                                     th:alt="${item.product.name}" 
+                                     class="w-20 h-20 object-cover rounded-lg">
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-gray-900" th:text="${item.product.name}">Product Name</h3>
+                                <p class="text-sm text-gray-600" th:text="${item.product.category.name}">Category</p>
+                                <p class="text-lg font-bold text-purple-600" th:text="${#numbers.formatDecimal(item.product.price, 1, 2)}">$29.99</p>
+                            </div>
+                            
+                            <!-- Quantity Controls -->
+                            <div class="flex items-center space-x-2">
+                                <form th:action="@{/cart/update}" method="post" class="flex items-center space-x-2">
+                                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                                    <label for="quantity" class="text-sm font-medium text-gray-700">Qty:</label>
+                                    <input type="number" id="quantity" name="quantity" 
+                                           th:value="${item.quantity}" 
+                                           min="1" max="10" 
+                                           class="w-16 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                                    <button type="submit" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                                        Update
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Remove Button -->
+                            <div class="flex-shrink-0">
+                                <form th:action="@{/cart/remove}" method="post">
+                                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                                    <button type="submit" class="text-red-600 hover:text-red-700 text-sm font-medium">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Item Total -->
+                            <div class="flex-shrink-0 text-right">
+                                <p class="text-lg font-bold text-gray-900" 
+                                   th:text="${#numbers.formatDecimal(item.product.price.multiply(item.quantity), 1, 2)}">$59.98</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Cart Summary</h3>
+                            <span class="text-sm text-gray-600" th:text="${cartItems.size() + ' items'}">2 items</span>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span class="font-semibold" th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">$59.98</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Shipping</span>
+                                <span class="font-semibold">$5.99</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tax</span>
+                                <span class="font-semibold" th:text="${#numbers.formatDecimal(cartTotal.multiply(0.08), 1, 2)}">$4.80</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-gray-900">Total</span>
+                                <span class="text-2xl font-bold text-purple-600" 
+                                      th:text="${#numbers.formatDecimal(cartTotal.add(5.99).add(cartTotal.multiply(0.08)), 1, 2)}">$70.77</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 space-y-3">
+                            <a href="/orders/checkout" 
+                               class="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center block font-semibold">
+                                Proceed to Checkout
+                            </a>
+                            
+                            <form th:action="@{/cart/clear}" method="post">
+                                <button type="submit" 
+                                        class="w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 font-semibold"
+                                        onclick="return confirm('Are you sure you want to clear your cart?')">
+                                    Clear Cart
+                                </button>
+                            </form>
+                            
+                            <a href="/products" 
+                               class="w-full bg-white text-purple-600 border border-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center block font-semibold">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty Cart -->
+                <div th:if="${cartItems == null or cartItems.empty}" class="text-center py-12">
+                    <div class="text-gray-500 text-lg mb-4">Your cart is empty</div>
+                    <p class="text-gray-600 mb-8">Add some products to get started!</p>
+                    <a href="/products" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300">
+                        Start Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

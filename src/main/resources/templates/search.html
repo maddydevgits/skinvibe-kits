@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="'Search Results for \"' + ${searchQuery} + '\" - SkinVibe'">Search Results - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Search Results</h1>
+                    <p class="mt-2 text-gray-600" th:text="'Results for \"' + ${searchQuery} + '\"'">Results for "search term"</p>
+                </div>
+
+                <!-- Search Form -->
+                <div class="mb-8">
+                    <form th:action="@{/search}" method="get" class="max-w-2xl">
+                        <div class="flex">
+                            <input type="text" name="q" th:value="${searchQuery}" 
+                                   placeholder="Search products..." 
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <button type="submit" 
+                                    class="bg-purple-600 text-white px-6 py-2 rounded-r-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search Results -->
+                <div th:if="${products != null and !products.empty}">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600" th:text="${products.totalElements} + ' results found'">10 results found</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div th:each="product : ${products.content}" class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="aspect-w-1 aspect-h-1">
+                                <img th:src="${product.imageUrl} ?: '/images/placeholder-product.jpg'" 
+                                     th:alt="${product.name}" 
+                                     class="w-full h-48 object-cover">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${product.name}">Product Name</h3>
+                                <p class="text-gray-600 text-sm mb-4" th:text="${#strings.abbreviate(product.description, 100)}">Product description...</p>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-2xl font-bold text-purple-600" th:text="${#numbers.formatDecimal(product.price, 1, 2)}">$29.99</span>
+                                    <span th:if="${product.stockQuantity > 0}" class="text-sm text-green-600">In Stock</span>
+                                    <span th:if="${product.stockQuantity == 0}" class="text-sm text-red-600">Out of Stock</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <a th:href="@{/products/{id}(id=${product.id})}" 
+                                       class="flex-1 bg-purple-600 text-white text-center px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-300">
+                                        View Details
+                                    </a>
+                                    <form th:action="@{/cart/add}" method="post" class="flex-1" th:if="${session.user != null}">
+                                        <input type="hidden" name="productId" th:value="${product.id}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" 
+                                                th:disabled="${product.stockQuantity == 0}"
+                                                class="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                            Add to Cart
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-12 flex justify-center" th:if="${products.totalPages > 1}">
+                        <nav class="flex space-x-2">
+                            <a th:if="${products.hasPrevious()}" 
+                               th:href="@{/search(q=${searchQuery}, page=${products.number - 1})}" 
+                               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Previous
+                            </a>
+                            <span th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                                  th:if="${i >= products.number - 2 and i <= products.number + 2}">
+                                <a th:href="@{/search(q=${searchQuery}, page=${i})}" 
+                                   th:class="${i == products.number} ? 'px-3 py-2 text-sm font-medium text-white bg-purple-600 border border-purple-600 rounded-md' : 'px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50'"
+                                   th:text="${i + 1}">1</a>
+                            </span>
+                            <a th:if="${products.hasNext()}" 
+                               th:href="@{/search(q=${searchQuery}, page=${products.number + 1})}" 
+                               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Next
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- No Results -->
+                <div th:if="${products == null or products.empty}" class="text-center py-12">
+                    <div class="text-gray-500 text-lg mb-4">No products found</div>
+                    <p class="text-gray-600 mb-8">Try adjusting your search terms or browse our categories.</p>
+                    <div class="space-x-4">
+                        <a href="/products" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300">
+                            Browse All Products
+                        </a>
+                        <a href="/home" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300">
+                            Back to Home
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div th:if="${categories != null and !categories.empty}" class="mt-12">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Browse by Category</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <a th:each="category : ${categories}" 
+                           th:href="@{/products/category/{id}(id=${category.id})}" 
+                           class="bg-gray-50 hover:bg-gray-100 rounded-lg p-4 text-center transition duration-300">
+                            <div class="text-sm font-medium text-gray-900" th:text="${category.name}">Category</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

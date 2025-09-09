@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title>Register - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        Create your account
+                    </h2>
+                    <p class="mt-2 text-center text-sm text-gray-600">
+                        Or
+                        <a href="/auth/login" class="font-medium text-purple-600 hover:text-purple-500">
+                            sign in to your existing account
+                        </a>
+                    </p>
+                </div>
+                
+                <form class="mt-8 space-y-6" th:action="@{/auth/register}" th:object="${user}" method="post">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input id="username" th:field="*{username}" type="text" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="Username">
+                            <div th:if="${#fields.hasErrors('username')}" class="text-red-500 text-sm mt-1" th:errors="*{username}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input id="email" th:field="*{email}" type="email" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="Email address">
+                            <div th:if="${#fields.hasErrors('email')}" class="text-red-500 text-sm mt-1" th:errors="*{email}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input id="firstName" th:field="*{firstName}" type="text" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="First Name">
+                            <div th:if="${#fields.hasErrors('firstName')}" class="text-red-500 text-sm mt-1" th:errors="*{firstName}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input id="lastName" th:field="*{lastName}" type="text" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="Last Name">
+                            <div th:if="${#fields.hasErrors('lastName')}" class="text-red-500 text-sm mt-1" th:errors="*{lastName}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
+                            <input id="phoneNumber" th:field="*{phoneNumber}" type="tel" 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="Phone Number">
+                            <div th:if="${#fields.hasErrors('phoneNumber')}" class="text-red-500 text-sm mt-1" th:errors="*{phoneNumber}"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input id="password" th:field="*{password}" type="password" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                                   placeholder="Password">
+                            <div th:if="${#fields.hasErrors('password')}" class="text-red-500 text-sm mt-1" th:errors="*{password}"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" 
+                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

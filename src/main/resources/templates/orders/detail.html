@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="'Order #' + ${order.orderNumber} + ' - SkinVibe'">Order Details - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900" th:text="'Order #' + ${order.orderNumber}">Order #SKV-12345678</h1>
+                            <p class="mt-2 text-gray-600" th:text="${#temporals.format(order.createdAt, 'MMM dd, yyyy')} + ' at ' + ${#temporals.format(order.createdAt, 'hh:mm a')}">Jan 15, 2024 at 2:30 PM</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-purple-600" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$70.77</div>
+                            <div class="text-sm">
+                                <span th:if="${order.orderStatus.name() == 'PENDING'}" 
+                                      class="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
+                                      th:text="${order.orderStatus.name()}">PENDING</span>
+                                <span th:if="${order.orderStatus.name() == 'CONFIRMED'}" 
+                                      class="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                                      th:text="${order.orderStatus.name()}">CONFIRMED</span>
+                                <span th:if="${order.orderStatus.name() == 'SHIPPED'}" 
+                                      class="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                      th:text="${order.orderStatus.name()}">SHIPPED</span>
+                                <span th:if="${order.orderStatus.name() == 'DELIVERED'}" 
+                                      class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                                      th:text="${order.orderStatus.name()}">DELIVERED</span>
+                                <span th:unless="${order.orderStatus.name() == 'PENDING' or order.orderStatus.name() == 'CONFIRMED' or order.orderStatus.name() == 'SHIPPED' or order.orderStatus.name() == 'DELIVERED'}" 
+                                      class="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+                                      th:text="${order.orderStatus.name()}">OTHER</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Order Items -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
+                            
+                            <div class="space-y-4">
+                                <div th:each="item : ${order.orderItems}" class="flex items-center space-x-4 border-b border-gray-200 pb-4 last:border-b-0">
+                                    <img th:src="${item.product.imageUrl} ?: '/images/placeholder-product.jpg'" 
+                                         th:alt="${item.product.name}" 
+                                         class="w-16 h-16 object-cover rounded-lg">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg font-semibold text-gray-900" th:text="${item.product.name}">Product Name</h3>
+                                        <p class="text-sm text-gray-600" th:text="${item.product.category.name}">Category</p>
+                                        <p class="text-sm text-gray-600" th:text="'Qty: ' + ${item.quantity}">Qty: 1</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-bold text-gray-900" th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">$29.99</div>
+                                        <div class="text-sm text-gray-600" th:text="'each'">each</div>
+                                        <div class="text-lg font-bold text-purple-600" th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">$29.99</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Information -->
+                    <div class="space-y-6">
+                        <!-- Order Summary -->
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                            
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="font-semibold" th:text="${#numbers.formatDecimal(order.totalAmount.subtract(order.shippingCost).subtract(order.taxAmount).add(order.discountAmount), 1, 2)}">$59.98</span>
+                                </div>
+                                <div class="flex justify-between" th:if="${order.shippingCost != null and order.shippingCost > 0}">
+                                    <span class="text-gray-600">Shipping</span>
+                                    <span class="font-semibold" th:text="${#numbers.formatDecimal(order.shippingCost, 1, 2)}">$5.99</span>
+                                </div>
+                                <div class="flex justify-between" th:if="${order.taxAmount != null and order.taxAmount > 0}">
+                                    <span class="text-gray-600">Tax</span>
+                                    <span class="font-semibold" th:text="${#numbers.formatDecimal(order.taxAmount, 1, 2)}">$4.80</span>
+                                </div>
+                                <div class="flex justify-between" th:if="${order.discountAmount != null and order.discountAmount > 0}">
+                                    <span class="text-gray-600">Discount</span>
+                                    <span class="font-semibold text-green-600" th:text="'-' + ${#numbers.formatDecimal(order.discountAmount, 1, 2)}">-$5.00</span>
+                                </div>
+                                <div class="border-t pt-2">
+                                    <div class="flex justify-between text-lg font-bold">
+                                        <span>Total</span>
+                                        <span class="text-purple-600" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$70.77</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6" th:if="${order.shippingAddress}">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h3>
+                            <div class="text-sm text-gray-700">
+                                <div>Shipping Address #<span th:text="${order.shippingAddress.id}">1</span></div>
+                                <div th:text="${order.shippingAddress.streetAddress}">123 Main St</div>
+                                <div th:if="${order.shippingAddress.addressLine2}" th:text="${order.shippingAddress.addressLine2}">Apt 4B</div>
+                                <div th:text="${order.shippingAddress.city + ', ' + order.shippingAddress.state + ' ' + order.shippingAddress.postalCode}">City, State 12345</div>
+                                <div th:text="${order.shippingAddress.country}">Country</div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Payment Method:</span>
+                                    <span th:text="${order.paymentMethod != null ? order.paymentMethod.name() : 'N/A'}">CREDIT_CARD</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Payment Status:</span>
+                                    <span th:if="${order.paymentStatus.name() == 'PAID'}" 
+                                          class="text-green-600" 
+                                          th:text="${order.paymentStatus.name()}">PAID</span>
+                                    <span th:if="${order.paymentStatus.name() == 'PENDING'}" 
+                                          class="text-yellow-600" 
+                                          th:text="${order.paymentStatus.name()}">PENDING</span>
+                                    <span th:unless="${order.paymentStatus.name() == 'PAID' or order.paymentStatus.name() == 'PENDING'}" 
+                                          class="text-red-600" 
+                                          th:text="${order.paymentStatus.name()}">OTHER</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tracking Information -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6" th:if="${order.trackingNumber}">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Tracking Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Tracking Number:</span>
+                                    <span class="font-mono" th:text="${order.trackingNumber}">1Z999AA1234567890</span>
+                                </div>
+                                <div th:if="${order.shippedAt}" class="flex justify-between">
+                                    <span class="text-gray-600">Shipped On:</span>
+                                    <span th:text="${#temporals.format(order.shippedAt, 'MMM dd, yyyy')}">Jan 16, 2024</span>
+                                </div>
+                                <div th:if="${order.deliveredAt}" class="flex justify-between">
+                                    <span class="text-gray-600">Delivered On:</span>
+                                    <span th:text="${#temporals.format(order.deliveredAt, 'MMM dd, yyyy')}">Jan 18, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Notes -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6" th:if="${order.notes}">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Notes</h3>
+                            <p class="text-sm text-gray-700" th:text="${order.notes}">Special delivery instructions...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 flex space-x-4">
+                    <a href="/orders" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300">
+                        Back to Orders
+                    </a>
+                    <a th:if="${order.orderStatus.name() == 'DELIVERED'}" 
+                       href="#" 
+                       class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300">
+                        Reorder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout}">
+<head>
+    <title th:text="${product.name} + ' - SkinVibe'">Product Detail - SkinVibe</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Breadcrumb -->
+                <nav class="flex mb-8" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="/home" class="text-gray-700 hover:text-purple-600">Home</a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <a href="/products" class="ml-1 text-gray-700 hover:text-purple-600 md:ml-2">Products</a>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="ml-1 text-gray-500 md:ml-2" th:text="${product.name}">Product Name</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Product Image -->
+                    <div class="aspect-w-1 aspect-h-1">
+                        <img th:src="${product.imageUrl} ?: '/images/placeholder-product.jpg'" 
+                             th:alt="${product.name}" 
+                             class="w-full h-96 object-cover rounded-lg">
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900" th:text="${product.name}">Product Name</h1>
+                            <p class="text-lg text-gray-600 mt-2" th:text="${product.category.name}">Category</p>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl font-bold text-purple-600" th:text="${#numbers.formatDecimal(product.price, 1, 2)}">$29.99</span>
+                            <span th:if="${product.stockQuantity > 0}" class="text-sm text-green-600 bg-green-100 px-2 py-1 rounded">In Stock</span>
+                            <span th:if="${product.stockQuantity == 0}" class="text-sm text-red-600 bg-red-100 px-2 py-1 rounded">Out of Stock</span>
+                        </div>
+
+                        <div class="prose max-w-none">
+                            <p class="text-gray-700" th:text="${product.description}">Product description...</p>
+                        </div>
+
+                        <!-- Add to Cart Form -->
+                        <form th:action="@{/cart/add}" method="post" th:if="${session.user != null}">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-2">
+                                    <label for="quantity" class="text-sm font-medium text-gray-700">Quantity:</label>
+                                    <input type="number" id="quantity" name="quantity" min="1" max="10" value="1" 
+                                           class="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                                </div>
+                                <button type="submit" 
+                                        th:disabled="${product.stockQuantity == 0}"
+                                        class="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Login Required Message -->
+                        <div th:if="${session.user == null}" class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                            <p class="text-yellow-800">Please <a href="/auth/login" class="text-purple-600 hover:text-purple-700 font-medium">login</a> to add items to your cart.</p>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="border-t pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Details</h3>
+                            <dl class="grid grid-cols-1 gap-4">
+                                <div th:if="${product.sku}">
+                                    <dt class="text-sm font-medium text-gray-500">SKU</dt>
+                                    <dd class="text-sm text-gray-900" th:text="${product.sku}">SKU-123456</dd>
+                                </div>
+                                <div th:if="${product.weight}">
+                                    <dt class="text-sm font-medium text-gray-500">Weight</dt>
+                                    <dd class="text-sm text-gray-900" th:text="${product.weight + ' grams'}">50 grams</dd>
+                                </div>
+                                <div th:if="${product.dimensions}">
+                                    <dt class="text-sm font-medium text-gray-500">Dimensions</dt>
+                                    <dd class="text-sm text-gray-900" th:text="${product.dimensions}">10x5x3 cm</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Stock</dt>
+                                    <dd class="text-sm text-gray-900" th:text="${product.stockQuantity + ' units available'}">10 units available</dd>
+                                </div>
+                            </dl>
+                        </div>
+
+                        <!-- Ingredients -->
+                        <div th:if="${product.ingredients}" class="border-t pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Ingredients</h3>
+                            <p class="text-sm text-gray-700" th:text="${product.ingredients}">Product ingredients...</p>
+                        </div>
+
+                        <!-- Usage Instructions -->
+                        <div th:if="${product.usageInstructions}" class="border-t pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Usage Instructions</h3>
+                            <p class="text-sm text-gray-700" th:text="${product.usageInstructions}">Usage instructions...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
